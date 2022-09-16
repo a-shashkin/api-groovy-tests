@@ -1,1 +1,1 @@
-# api-groovy-tests
+Repository contains API tests utilizing Groovy.
