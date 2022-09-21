@@ -1,9 +1,14 @@
 package com.simbirsoft;
 
+import com.simbirsoft.lombok.LombokRegisterTokenData;
 import com.simbirsoft.lombok.LombokResourceData;
 import com.simbirsoft.models.ModelUser;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static io.restassured.RestAssured.*;
 import static com.simbirsoft.Specs.requestSpecification;
@@ -92,5 +97,27 @@ public class ReqresSpecsTest {
         assertEquals(6, resourceData.getPerPage());
         assertEquals(12, resourceData.getTotal());
         assertEquals(2, resourceData.getTotalPages());
+    }
+
+    @Test
+    void registerUserTest() {
+        Map<String, String> jsonBody = new HashMap<>();
+        jsonBody.put("email", "eve.holt@reqres.in");
+        jsonBody.put("password", "pistol");
+
+        LombokRegisterTokenData response =
+                given().
+                        header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+                                "(KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36").
+                        spec(requestSpecification).
+                        body(jsonBody).
+                        when().
+                        post("https://reqres.in/api/register").
+                        then().
+                        spec(responseSpecification).
+                        extract().as(LombokRegisterTokenData.class);
+
+        assertEquals(4, response.getId());
+        assertEquals("QpwL5tke4Pnpja7X4", response.getToken());
     }
 }
