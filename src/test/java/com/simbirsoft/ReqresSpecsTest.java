@@ -1,6 +1,7 @@
 package com.simbirsoft;
 
 import com.simbirsoft.lombok.LombokResourceData;
+import com.simbirsoft.models.ModelUser;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Test;
 
@@ -8,6 +9,7 @@ import static io.restassured.RestAssured.*;
 import static com.simbirsoft.Specs.requestSpecification;
 import static com.simbirsoft.Specs.responseSpecification;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.Matchers.hasItem;
 
 public class ReqresSpecsTest {
 
@@ -44,6 +46,34 @@ public class ReqresSpecsTest {
         assertEquals("Janet Weaver", name);
         assertEquals(2, id);
         assertEquals("janet.weaver@reqres.in", email);
+    }
+
+    @Test
+    void getSingleUserModelTest() {
+        ModelUser user =
+                given()
+                        .spec(requestSpecification)
+                .when()
+                        .get("/users/2")
+                .then()
+                        .spec(responseSpecification)
+                        .extract().as(ModelUser.class);
+
+        assertEquals(2, user.getData().getId());
+        assertEquals("Janet Weaver", user.getData().getFirstName() + " " + user.getData().getLastName());
+        assertEquals("janet.weaver@reqres.in", user.getData().getEmail());
+    }
+
+    @Test
+    void getSingleUserGroovyTest() {
+                given()
+                        .spec(requestSpecification)
+                .when()
+                        .get("/users")
+                .then()
+                        .log().body()
+                        .body("data.findAll{it.email =~/.*?@reqres.in/}.email.flatten()",
+                                hasItem("janet.weaver@reqres.in"));
     }
 
     @Test
